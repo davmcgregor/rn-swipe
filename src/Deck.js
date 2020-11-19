@@ -1,7 +1,10 @@
-import React from 'react';
-import { View, Animated, StyleSheet } from 'react-native';
+import React, { useRef } from 'react';
+import { View, Animated, StyleSheet, PanResponder } from 'react-native';
 
 const Deck = ({ data, renderCard }) => {
+  
+  const panResponder = useRef(PanResponder.create({})).current;
+
   const renderCards = () => {
     return data.map((item) => renderCard(item));
   };
