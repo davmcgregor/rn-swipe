@@ -1,54 +1,73 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, Image } from 'react-native';
+import { Card, ListItem, Button, Icon } from 'react-native-elements';
 import Deck from './src/Deck';
 
 const DATA = [
   {
     id: 1,
     text: 'Card #1',
-    uri: 'http://imgs.abduzeedo.com/files/paul0v2/unsplash/unsplash-04.jpg',
+    uri: 'https://placeimg.com/640/480/any',
   },
   {
     id: 2,
     text: 'Card #2',
-    uri: 'http://www.fluxdigital.co/wp-content/uploads/2015/04/Unsplash.jpg',
+    uri: 'https://placeimg.com/640/480/any',
   },
   {
     id: 3,
     text: 'Card #3',
-    uri: 'http://imgs.abduzeedo.com/files/paul0v2/unsplash/unsplash-09.jpg',
+    uri: 'https://placeimg.com/640/480/any',
   },
   {
     id: 4,
     text: 'Card #4',
-    uri: 'http://imgs.abduzeedo.com/files/paul0v2/unsplash/unsplash-01.jpg',
+    uri: 'https://placeimg.com/640/480/any',
   },
   {
     id: 5,
     text: 'Card #5',
-    uri: 'http://imgs.abduzeedo.com/files/paul0v2/unsplash/unsplash-04.jpg',
+    uri: 'https://placeimg.com/640/480/any',
   },
   {
     id: 6,
     text: 'Card #6',
-    uri: 'http://www.fluxdigital.co/wp-content/uploads/2015/04/Unsplash.jpg',
+    uri: 'https://placeimg.com/640/480/any',
   },
   {
     id: 7,
     text: 'Card #7',
-    uri: 'http://imgs.abduzeedo.com/files/paul0v2/unsplash/unsplash-09.jpg',
+    uri: 'https://placeimg.com/640/480/any',
   },
   {
     id: 8,
     text: 'Card #8',
-    uri: 'http://imgs.abduzeedo.com/files/paul0v2/unsplash/unsplash-01.jpg',
+    uri: 'https://placeimg.com/640/480/any',
   },
 ];
 
 const App = () => {
-  
   const renderCard = (item) => {
-    return <Text>{item.text}</Text>;
+    return (
+      <Card key={item.id}>
+        <Card.Title h3>{item.text}</Card.Title>
+        <Card.Divider />
+        <Card.Image source={{ uri: item.uri }} />
+        <Text style={{ marginVertical: 10 }}>
+          I can customise the card further
+        </Text>
+        <Button
+          icon={<Icon name='code' color='#ffffff' />}
+          buttonStyle={{
+            borderRadius: 0,
+            marginLeft: 0,
+            marginRight: 0,
+            marginBottom: 0,
+          }}
+          title='VIEW NOW'
+        />
+      </Card>
+    );
   };
 
   return (
@@ -60,6 +79,7 @@ const App = () => {
 
 const styles = StyleSheet.create({
   container: {
+    marginTop: 100,
     flex: 1,
     backgroundColor: '#fff',
   },
