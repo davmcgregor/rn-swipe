@@ -20,7 +20,13 @@ const Deck = ({ data, renderCard }) => {
       toValue: { x, y: 0 },
       duration: SWIPE_OUT_DURATION,
       useNativeDriver: true,
-    }).start();
+    }).start(onSwipeComplete(direction));
+  };
+
+  const onSwipeComplete = (direction) => {
+    const { onSwipeLeft, onSwipeRight } = this.props;
+    
+    direction === 'right' ? onSwipeRight() : onSwipeLeft();
   };
 
   const resetPosition = () => {
@@ -56,13 +62,7 @@ const Deck = ({ data, renderCard }) => {
       outputRange: ['-120deg', '0deg', '120deg'],
     });
 
-    // const color = pan.x.interpolate({
-    //   inputRange: [-500, 500],
-    //   outputRange: ['rgb(0,0,0)', 'rgb(51,250,170)'],
-    // });
-
     return {
-      // backgroundColor: color,
       transform: [{ translateX: pan.x }, { translateY: pan.y }, { rotate }],
     };
   };
