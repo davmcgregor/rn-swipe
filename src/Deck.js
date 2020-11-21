@@ -8,25 +8,30 @@ import {
 } from 'react-native';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
+const SWIPE_THRESHOLD = 0.25 * SCREEN_WIDTH;
 
 const Deck = ({ data, renderCard }) => {
   const pan = useRef(new Animated.ValueXY()).current;
 
   const panResponder = useRef(
     PanResponder.create({
-      onMoveShouldSetPanResponder: () => true,
-      onPanResponderGrant: () => {
-        pan.setOffset({
-          x: pan.x._value,
-          y: pan.y._value,
-        });
+      onStartShouldSetPanResponder: () => true,
+      onPanResponderMove: (evt, gestureState) => {
+        return Animated.event([null, { dx: pan.x, dy: pan.y }], {
+          useNativeDriver: false,
+        })(evt, gestureState);
       },
-      onPanResponderMove: Animated.event([null, { dx: pan.x, dy: pan.y }]),
-      onPanResponderRelease: () => {
-        Animated.spring(
-          pan, // Auto-multiplexed
-          { toValue: { x: 0, y: 0 }, friction: 6 } // Back to zero
-        ).start();
+      onPanResponderRelease: (evt, gestureState) => {
+        if (gestureState.dx > SWIPE_THRESHOLD) {
+          console.log('swipe right');
+        } else if (gestureState.dx < -SWIPE_THRESHOLD) {
+          console.log('swipe left');
+        } else {
+          Animated.spring(
+            pan, // Auto-multiplexed
+            { toValue: { x: 0, y: 0 }, friction: 6, useNativeDriver: true } // Back to zero
+          ).start();
+        }
       },
     })
   ).current;
