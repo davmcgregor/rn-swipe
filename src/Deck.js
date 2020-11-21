@@ -20,20 +20,37 @@ const Deck = ({ data, renderCard }) => {
     })
   ).current;
 
+  const getCardStyle = () => {
+    const rotate = pan.x.interpolate({
+      inputRange: [-500, 0, 500],
+      outputRange: ['-120deg', '0deg', '120deg'],
+    });
+
+    return {
+      transform: [{ translateX: pan.x }, { translateY: pan.y }, { rotate }],
+    };
+  };
+
   const renderCards = () => {
-    return data.map((item) => renderCard(item));
+    return data.map((item, index) => {
+      if (index === 0) {
+        return (
+          <Animated.View
+            key={item.id}
+            style={getCardStyle()}
+            {...panResponder.panHandlers}
+          >
+            {renderCard(item)}
+          </Animated.View>
+        );
+      }
+      return renderCard(item);
+    });
   };
 
   return (
     <View>
-      <Animated.View
-        style={{
-          transform: [{ translateX: pan.x }, { translateY: pan.y }],
-        }}
-        {...panResponder.panHandlers}
-      >
-        {renderCards()}
-      </Animated.View>
+      <View>{renderCards()}</View>
     </View>
   );
 };
