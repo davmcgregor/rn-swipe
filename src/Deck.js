@@ -8,29 +8,43 @@ import {
 } from 'react-native';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
-const SWIPE_THRESHOLD = 0.25 * SCREEN_WIDTH;
+const SWIPE_THRESHOLD = 0.5 * SCREEN_WIDTH;
+const SWIPE_OUT_DURATION = 250;
 
 const Deck = ({ data, renderCard }) => {
   const pan = useRef(new Animated.ValueXY()).current;
+
+  const forceSwipe = (direction) => {
+    const x = direction === 'right' ? SCREEN_WIDTH * 1.1 : -SCREEN_WIDTH * 1.1;
+    Animated.timing(pan, {
+      toValue: { x, y: 0 },
+      duration: SWIPE_OUT_DURATION,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const resetPosition = () => {
+    Animated.spring(
+      pan, // Auto-multiplexed
+      { toValue: { x: 0, y: 0 }, friction: 6, useNativeDriver: true } // Back to zero
+    ).start();
+  };
 
   const panResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,
       onPanResponderMove: (evt, gestureState) => {
-        return Animated.event([null, { dx: pan.x, dy: pan.y }], {
+        Animated.event([null, { dx: pan.x, dy: pan.y }], {
           useNativeDriver: false,
         })(evt, gestureState);
       },
       onPanResponderRelease: (evt, gestureState) => {
         if (gestureState.dx > SWIPE_THRESHOLD) {
-          console.log('swipe right');
+          forceSwipe('right');
         } else if (gestureState.dx < -SWIPE_THRESHOLD) {
-          console.log('swipe left');
+          forceSwipe('left');
         } else {
-          Animated.spring(
-            pan, // Auto-multiplexed
-            { toValue: { x: 0, y: 0 }, friction: 6, useNativeDriver: true } // Back to zero
-          ).start();
+          resetPosition();
         }
       },
     })
