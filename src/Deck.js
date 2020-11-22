@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import {
   View,
   Animated,
@@ -18,15 +18,17 @@ const Deck = ({
   onSwipeRight,
   onSwipeLeft,
 }) => {
+  
   const position = useRef(new Animated.ValueXY()).current;
   const [index, setIndex] = useState(0);
+  const refIndex = useRef(index);
 
-  console.log('inside', index);
+  useEffect(() => {
+    refIndex.current = index;
+  });
 
   const onSwipeComplete = (direction) => {
-    console.log('outside', index);
-
-    const item = data[index];
+    const item = data[refIndex.current];
 
     direction === 'right' ? onSwipeRight(item) : onSwipeLeft(item);
     position.setValue({ x: 0, y: 0 });
