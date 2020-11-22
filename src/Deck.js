@@ -29,6 +29,10 @@ const Deck = ({
   LayoutAnimation.spring();
 
   useEffect(() => {
+    setIndex(0);
+  }, [data]);
+
+  useEffect(() => {
     refIndex.current = index;
   });
 
