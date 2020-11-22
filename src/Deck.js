@@ -18,7 +18,6 @@ const Deck = ({
   onSwipeRight,
   onSwipeLeft,
 }) => {
-  
   const position = useRef(new Animated.ValueXY()).current;
   const [index, setIndex] = useState(0);
   const refIndex = useRef(index);
@@ -106,19 +105,18 @@ const Deck = ({
           );
         }
         return (
-          <View key={item.id} style={styles.cardStyle}>
+          <Animated.View
+            key={item.id}
+            style={[styles.cardStyle, { top: 10 * (i - index) }]}
+          >
             {renderCard(item)}
-          </View>
+          </Animated.View>
         );
       })
       .reverse();
   };
 
-  return (
-    <View>
-      <View>{renderCards()}</View>
-    </View>
-  );
+  return <View>{renderCards()}</View>;
 };
 
 const styles = StyleSheet.create({
