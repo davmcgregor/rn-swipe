@@ -70,9 +70,22 @@ const App = () => {
     );
   };
 
+  const onSwipeRight = (item) => {
+    return console.log(item);
+  };
+
+  const onSwipeLeft = (item) => {
+    return console.log(item);
+  };
+
   return (
     <View style={styles.container}>
-      <Deck data={DATA} renderCard={renderCard} />
+      <Deck
+        data={DATA}
+        renderCard={renderCard}
+        onSwipeLeft={onSwipeLeft}
+        onSwipeRight={onSwipeRight}
+      />
     </View>
   );
 };

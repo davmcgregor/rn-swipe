@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   View,
   Animated,
@@ -11,7 +11,9 @@ const SCREEN_WIDTH = Dimensions.get('window').width;
 const SWIPE_THRESHOLD = 0.5 * SCREEN_WIDTH;
 const SWIPE_OUT_DURATION = 250;
 
-const Deck = ({ data, renderCard }) => {
+const Deck = ({ data, renderCard, onSwipeRight, onSwipeLeft }) => {
+  const [index, setIndex] = useState(0);
+
   const pan = useRef(new Animated.ValueXY()).current;
 
   const forceSwipe = (direction) => {
@@ -24,16 +26,19 @@ const Deck = ({ data, renderCard }) => {
   };
 
   const onSwipeComplete = (direction) => {
-    const { onSwipeLeft, onSwipeRight } = this.props;
-    
-    direction === 'right' ? onSwipeRight() : onSwipeLeft();
+    const item = data[index];
+
+    direction === 'right' ? onSwipeRight(item) : onSwipeLeft(item);
+    pan.setValue({ x: 0, y: 0 });
+    setIndex(index + 1);
   };
 
   const resetPosition = () => {
-    Animated.spring(
-      pan, // Auto-multiplexed
-      { toValue: { x: 0, y: 0 }, friction: 6, useNativeDriver: true } // Back to zero
-    ).start();
+    Animated.spring(pan, {
+      toValue: { x: 0, y: 0 },
+      friction: 6,
+      useNativeDriver: true,
+    }).start();
   };
 
   const panResponder = useRef(
@@ -68,8 +73,10 @@ const Deck = ({ data, renderCard }) => {
   };
 
   const renderCards = () => {
-    return data.map((item, index) => {
-      if (index === 0) {
+    return data.map((item, i) => {
+      if (i < index) return null;
+
+      if (i === index) {
         return (
           <Animated.View
             key={item.id}
