@@ -5,6 +5,8 @@ import {
   StyleSheet,
   PanResponder,
   Dimensions,
+  LayoutAnimation,
+  UIManager,
 } from 'react-native';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -21,6 +23,10 @@ const Deck = ({
   const position = useRef(new Animated.ValueXY()).current;
   const [index, setIndex] = useState(0);
   const refIndex = useRef(index);
+
+  UIManager.setLayoutAnimationEnabledExperimental &&
+    UIManager.setLayoutAnimationEnabledExperimental(true);
+  LayoutAnimation.spring();
 
   useEffect(() => {
     refIndex.current = index;
