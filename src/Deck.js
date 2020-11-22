@@ -8,33 +8,42 @@ import {
 } from 'react-native';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
-const SWIPE_THRESHOLD = 0.5 * SCREEN_WIDTH;
+const SWIPE_THRESHOLD = 0.25 * SCREEN_WIDTH;
 const SWIPE_OUT_DURATION = 250;
 
-const Deck = ({ data, renderCard, onSwipeRight, onSwipeLeft }) => {
+const Deck = ({
+  data,
+  renderCard,
+  renderNoMoreCards,
+  onSwipeRight,
+  onSwipeLeft,
+}) => {
+  const position = useRef(new Animated.ValueXY()).current;
   const [index, setIndex] = useState(0);
 
-  const pan = useRef(new Animated.ValueXY()).current;
-
-  const forceSwipe = (direction) => {
-    const x = direction === 'right' ? SCREEN_WIDTH * 1.1 : -SCREEN_WIDTH * 1.1;
-    Animated.timing(pan, {
-      toValue: { x, y: 0 },
-      duration: SWIPE_OUT_DURATION,
-      useNativeDriver: true,
-    }).start(onSwipeComplete(direction));
-  };
+  console.log('inside', index);
 
   const onSwipeComplete = (direction) => {
+    console.log('outside', index);
+
     const item = data[index];
 
     direction === 'right' ? onSwipeRight(item) : onSwipeLeft(item);
-    pan.setValue({ x: 0, y: 0 });
-    setIndex(index + 1);
+    position.setValue({ x: 0, y: 0 });
+    setIndex((prevIndex) => prevIndex + 1);
+  };
+
+  const forceSwipe = (direction) => {
+    const x = direction === 'right' ? SCREEN_WIDTH * 1.1 : -SCREEN_WIDTH * 1.1;
+    Animated.timing(position, {
+      toValue: { x, y: 0 },
+      duration: SWIPE_OUT_DURATION,
+      useNativeDriver: true,
+    }).start(() => onSwipeComplete(direction));
   };
 
   const resetPosition = () => {
-    Animated.spring(pan, {
+    Animated.spring(position, {
       toValue: { x: 0, y: 0 },
       friction: 6,
       useNativeDriver: true,
@@ -44,15 +53,13 @@ const Deck = ({ data, renderCard, onSwipeRight, onSwipeLeft }) => {
   const panResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,
-      onPanResponderMove: (evt, gestureState) => {
-        Animated.event([null, { dx: pan.x, dy: pan.y }], {
-          useNativeDriver: false,
-        })(evt, gestureState);
+      onPanResponderMove: (event, { dx, dy }) => {
+        position.setValue({ x: dx, y: dy });
       },
-      onPanResponderRelease: (evt, gestureState) => {
-        if (gestureState.dx > SWIPE_THRESHOLD) {
+      onPanResponderRelease: (evt, { dx }) => {
+        if (dx > SWIPE_THRESHOLD) {
           forceSwipe('right');
-        } else if (gestureState.dx < -SWIPE_THRESHOLD) {
+        } else if (dx < -SWIPE_THRESHOLD) {
           forceSwipe('left');
         } else {
           resetPosition();
@@ -62,33 +69,47 @@ const Deck = ({ data, renderCard, onSwipeRight, onSwipeLeft }) => {
   ).current;
 
   const getCardStyle = () => {
-    const rotate = pan.x.interpolate({
-      inputRange: [-SCREEN_WIDTH * 2, 0, SCREEN_WIDTH * 2],
+    const rotate = position.x.interpolate({
+      inputRange: [-SCREEN_WIDTH * 1.5, 0, SCREEN_WIDTH * 1.5],
       outputRange: ['-120deg', '0deg', '120deg'],
     });
 
     return {
-      transform: [{ translateX: pan.x }, { translateY: pan.y }, { rotate }],
+      transform: [
+        { translateX: position.x },
+        { translateY: position.y },
+        { rotate },
+      ],
     };
   };
 
   const renderCards = () => {
-    return data.map((item, i) => {
-      if (i < index) return null;
+    if (index >= data.length) {
+      return renderNoMoreCards();
+    }
 
-      if (i === index) {
+    return data
+      .map((item, i) => {
+        if (i < index) return null;
+
+        if (i === index) {
+          return (
+            <Animated.View
+              key={item.id}
+              style={[getCardStyle(), styles.cardStyle]}
+              {...panResponder.panHandlers}
+            >
+              {renderCard(item)}
+            </Animated.View>
+          );
+        }
         return (
-          <Animated.View
-            key={item.id}
-            style={getCardStyle()}
-            {...panResponder.panHandlers}
-          >
+          <View key={item.id} style={styles.cardStyle}>
             {renderCard(item)}
-          </Animated.View>
+          </View>
         );
-      }
-      return renderCard(item);
-    });
+      })
+      .reverse();
   };
 
   return (
@@ -98,6 +119,11 @@ const Deck = ({ data, renderCard, onSwipeRight, onSwipeLeft }) => {
   );
 };
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  cardStyle: {
+    position: 'absolute',
+    width: SCREEN_WIDTH,
+  },
+});
 
 export default Deck;

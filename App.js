@@ -70,12 +70,33 @@ const App = () => {
     );
   };
 
+  const renderNoMoreCards = () => {
+    return (
+      <Card>
+        <Card.Title h3>All Done!</Card.Title>
+        <Card.Divider />
+        <Text style={{ marginVertical: 10 }}>
+          There is no more content here!
+        </Text>
+        <Button
+          buttonStyle={{
+            borderRadius: 0,
+            marginLeft: 0,
+            marginRight: 0,
+            marginBottom: 0,
+          }}
+          title='Get more!'
+        />
+      </Card>
+    );
+  };
+
   const onSwipeRight = (item) => {
-    return console.log(item);
+    return console.log('right', item);
   };
 
   const onSwipeLeft = (item) => {
-    return console.log(item);
+    return console.log('left', item);
   };
 
   return (
@@ -83,6 +104,7 @@ const App = () => {
       <Deck
         data={DATA}
         renderCard={renderCard}
+        renderNoMoreCards={renderNoMoreCards}
         onSwipeLeft={onSwipeLeft}
         onSwipeRight={onSwipeRight}
       />
